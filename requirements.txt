@@ -1,0 +1,12 @@
+# Librerías usadas por P5_ANI_final.ipynb (Google Colab, Python 3)
+pymupdf
+chromadb
+sentence-transformers
+rank_bm25
+langchain-text-splitters
+google-genai
+gradio
+holidays
+openpyxl
+pandas
+matplotlib

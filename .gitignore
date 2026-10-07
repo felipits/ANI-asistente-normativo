@@ -1,0 +1,10 @@
+# Datos generados o con información de usuarios
+ANI_feedback.csv
+fragmentos*.json
+chroma_ani/
+
+# Archivos de sistema
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store
+Thumbs.db
