@@ -1,12 +1,16 @@
-# Librerías usadas por P5_ANI_final.ipynb (Google Colab, Python 3)
+# Librerías usadas por notebooks/P6_ANI_agente_v8.ipynb (Google Colab, Python 3)
+# La celda 1 del notebook las instala; este archivo es para ejecutarlo fuera de Colab.
 pymupdf
 chromadb
 sentence-transformers
 rank_bm25
-langchain-text-splitters
-google-genai
-gradio
 holidays
 openpyxl
 pandas
 matplotlib
+gradio
+google-genai
+langchain-text-splitters
+langchain-core
+langchain-classic                # AgentExecutor y create_tool_calling_agent (igual que los cuadernos de RA2)
+langchain-google-genai>=4        # la 2.x no devuelve la thought_signature de Gemini 3 y da error 400

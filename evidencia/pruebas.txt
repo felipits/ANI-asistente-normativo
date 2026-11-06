@@ -1,0 +1,27 @@
+Salida de la celda 6b · PRUEBAS AUTOMÁTICAS
+Notebook: notebooks/P6_ANI_agente_v8.ipynb · Google Colab con GPU T4 · 6 de noviembre de 2026
+No gastan cuota de Gemini: base SQLite temporal, fechas fijas y un modelo simulado para la prueba de memoria.
+
+✅ test_convivencia_va_primero
+✅ test_falta_dato_pide_info
+✅ test_reprogramacion_justificada_escribe
+✅ test_replanifica_si_falto_hace_semanas
+✅ test_replanifica_si_corrige_asistencia
+✅ test_notas_fuera_de_plazo
+✅ test_plazo_salta_feriados
+✅ test_no_escribe_sin_confirmacion
+✅ test_confirmado_escribe_y_guarda_caso
+✅ test_escritura_rechaza_rut
+⏱️ 0.0 s con gemini-3.1-flash-lite
+⏱️ 0.0 s con gemini-3.1-flash-lite
+   🔁 re-búsqueda antes de rechazar
+✅ test_memoria_corto_plazo_ventana
+
+11/11 pruebas pasaron
+
+Nota: las dos líneas ⏱️ y la de 🔁 son parte de test_memoria_corto_plazo_ventana. El modelo simulado
+responde primero "No está regulado", ANI re-busca, y la prueba comprueba que el modelo recibió solo los
+últimos 6 turnos (12 mensajes) en ambos intentos y que el turno quedó guardado una sola vez.
+
+Verificación adicional: si se elimina la ventana de memoria en la clase AgenteANI, esta prueba falla
+(10/11), así que detecta el error que debe detectar.

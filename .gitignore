@@ -8,3 +8,8 @@ chroma_ani/
 __pycache__/
 .DS_Store
 Thumbs.db
+
+# Memoria de casos y archivos generados por la interfaz (no se publican)
+ani_memoria.db
+pruebas_ani.db
+salidas/

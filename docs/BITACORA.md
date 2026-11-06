@@ -76,6 +76,34 @@ Cada iteración partió de un diagnóstico medido con el set de 40 preguntas: qu
 - Medición final con GPU T4.
 - **Resultado:** exactitud 92,5 %, fidelidad 9,8, relevancia 9,7, Context Recall 93,8 %, Hit@k 96,9 %, rechazo 100 % y cita correcta 96,9 % (31/32). Latencia mediana de 19,2 s con GPU. Quedan 4 casos por mejorar: #11 y #37 (recuperación: acta del PAI y supletoriedad del Decreto 67) y #17 y #38 (generación: respuesta incompleta).
 
+## P6 · Agente con LangChain, trámites y memoria de largo plazo (Adolfo y Felipe) → v8 · EP2
+
+**Notebook:** `notebooks/P6_ANI_agente_v8.ipynb`, el ejecutable de la EP2.
+
+**Diagnóstico:** la v7 respondía bien (92,5 % de exactitud), pero no cumplía lo que pide la EP2. Usaba el SDK de Gemini directo y no un framework de agentes, no tenía herramientas de escritura, su memoria vivía en RAM y se perdía al cerrar Colab, y sus decisiones eran de un solo paso.
+
+**Cambios (Adolfo):**
+
+- **Agente con LangChain:** `create_tool_calling_agent` + `AgentExecutor` de `langchain-classic`, sobre `langchain-google-genai` 4.x. Las 4 herramientas de la v7 pasan a `@tool` y se agregan `evaluar_promocion` (Art. 10 calculado en Python) y `consultar_caso`. El prompt de 13 reglas y los controles por código (búsqueda obligatoria, re-búsqueda antes de rechazar y respaldo de modelos) se mantienen.
+- **Versiones:** la guía TechStore fija `langchain<1.0` y `langchain-google-genai<3`, pero con Gemini 3 la 2.x no devuelve la *thought signature* después de llamar una herramienta y Gemini responde error 400. La 4.x sí la maneja.
+- **Memoria de corto plazo:** ventana de los últimos 6 turnos en `chat_history`. El turno se guarda una sola vez, al final, para que los reintentos internos no lo dupliquen. Se descartó `ConversationSummaryMemory` porque cuesta una llamada extra por turno y puede perder un dato exacto.
+- **Memoria de largo plazo:** casos en SQLite (`ani_memoria.db`) dentro de la carpeta ANI de Drive, con un código de caso (`C-XXXXXX`), sin login ni RUT, y borrado a los 60 días sin movimiento (Ley 21.719).
+- **Herramientas de escritura:** `registrar_solicitud`, `redactar_solicitud` (borrador `.md`) y `crear_recordatorio` (`.ics`). No se le entregan al agente LLM: las ejecuta el flujo de trámites y solo después de la confirmación. Las tres rechazan RUT, correo y teléfono.
+- **Planner de trámites:** 11 reglas en orden de prioridad para reprogramación, promoción y plazo de notas, con re-planificación cuando cambia un dato.
+- **Interfaz:** pestaña 📋 Trámites (formulario, Evaluar, Confirmar y registrar, descargas y Retomar caso), junto a la pestaña 💬 Consulta.
+- **Lectura de documentos en Markdown** con marcas `<!-- página N -->`, con prioridad sobre el PDF. Se recuperó la corrección de la v7 en la etiqueta de los protocolos, que se había perdido al reescribir `etiqueta()`.
+- **11 pruebas automáticas** (celda 6b) y **regresión v7 → v8** con las 40 preguntas.
+
+**Revisión y cierre (Felipe):**
+
+- Se renombró el notebook a `P6_ANI_agente_v8.ipynb`, que es el nombre al que apuntan el README y el informe.
+- El notebook estaba configurado para abrir con **TPU**, por eso la regresión se midió "sin GPU". Se dejó en **GPU T4**.
+- La prueba `test_memoria_corto_plazo_ventana` solo comprobaba que una lista se cortara en 12 elementos. Ahora usa un modelo simulado y verifica que el agente recibe solo los últimos 6 turnos y guarda cada turno una vez, aunque re-busque. Si se elimina la ventana, la prueba falla.
+- Prueba en Colab con GPU T4: **11/11** ([`evidencia/pruebas.txt`](../evidencia/pruebas.txt)).
+- Prueba de punta a punta en la interfaz (6 de noviembre de 2026): consulta con cita y seguimiento (150 → 160 días), trámite confirmado (`ANI-2026-0002`, borrador y `.ics`, caso `C-4C70FE`), re-planificación al corregir la fecha (18 días hábiles → `derivar_utp_fuera_de_plazo`) y recuperación del caso con su código ([`evidencia/capturas/`](../evidencia/capturas/)).
+
+**Resultado:** exactitud 97,5 %, fidelidad 9,8, relevancia 9,8, Context Recall 96,9 %, Hit@k 96,9 %, rechazo 100 % y cita correcta 93,8 % (30/32). Cumple 6 de 7 criterios; Context Precision sigue en 31,7 %. Quedan 3 casos por revisar: #23 (cita equivocada), #28 (rechazo correcto con una sugerencia de más) y #37 (supletoriedad del Decreto 67: no llega el Art. 3 y cita un artículo inexistente). Los casos #11, #17 y #38 de la v7 quedaron resueltos.
+
 ---
 
 ## Pendientes y trabajo futuro

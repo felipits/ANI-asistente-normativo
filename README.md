@@ -69,6 +69,8 @@ flowchart TD
     T6 --> ML
 ```
 
+El mismo diagrama, en la versión del informe: [`docs/ANI_diagrama_orquestacion_v8.png`](docs/ANI_diagrama_orquestacion_v8.png).
+
 | Componente | Implementación |
 |---|---|
 | Fragmentación | PDF (PyMuPDF) o Markdown, por sección, artículo, punto o protocolo. Fragmentos de 800 caracteres con solape de 150 y su **página exacta** (1.142 fragmentos) |
@@ -147,7 +149,7 @@ La celda **6b** corre 11 pruebas automáticas que no gastan cuota de Gemini. Usa
 | `test_no_escribe_sin_confirmacion` | Sin confirmación no se genera ningún archivo ni registro |
 | `test_confirmado_escribe_y_guarda_caso` | Con confirmación se generan el registro, el borrador y el recordatorio, y se guarda el caso |
 | `test_escritura_rechaza_rut` | El registro rechaza un texto con RUT |
-| `test_memoria_corto_plazo_ventana` | La memoria de corto plazo corta en 6 turnos |
+| `test_memoria_corto_plazo_ventana` | Con un modelo simulado: el agente recibe solo los últimos 6 turnos y guarda cada turno una vez, aunque re-busque |
 
 ## Iteraciones
 
@@ -194,12 +196,14 @@ Los archivos de cada medición están en [`evaluacion/`](evaluacion/) y el set d
 
 ## Evidencia
 
+Prueba de punta a punta en la interfaz, ejecutada en Colab con GPU T4 el 6 de noviembre de 2026.
+
 | Captura | Qué muestra |
 |---|---|
-| [Consulta con cita](evidencia/capturas/01_consulta_cita.png) | Respuesta con documento y página, y uso de `calcular_asistencia` |
-| [Trámite confirmado](evidencia/capturas/02_tramite_confirmado.png) | Registro para UTP, borrador y recordatorio `.ics` listos para descargar |
-| [Re-planificación](evidencia/capturas/03_replanificacion.png) | Cambio de acción al corregir un dato (🔁) |
-| [Retomar caso](evidencia/capturas/04_retomar_caso.png) | Memoria de largo plazo: el trámite se recupera con su código |
+| [Consulta con cita](evidencia/capturas/01_consulta_cita.png) | 150 de 180 días → `calcular_asistencia` (83,3 %), búsqueda en el reglamento y el decreto, y respuesta con fuentes. El seguimiento "¿Y si fueron 160 días?" se responde con el contexto anterior (88,9 %) |
+| [Trámite confirmado](evidencia/capturas/02_tramite_confirmado.png) | Inasistencia justificada del 04-11 → `solicitar_reprogramacion`, plazo 11-11-2026, solicitud `ANI-2026-0002`, borrador `.md`, recordatorio `.ics` y caso `C-4C70FE` |
+| [Re-planificación](evidencia/capturas/03_replanificacion.png) | Al corregir la fecha al 13-10 (18 días hábiles), ANI cambia de `solicitar_reprogramacion` a `derivar_utp_fuera_de_plazo` y vuelve a pedir confirmación |
+| [Retomar caso](evidencia/capturas/04_retomar_caso.png) | Memoria de largo plazo: con el código `C-4C70FE` se recupera la última acción y el plazo del trámite |
 
 ## Estructura
 
@@ -208,7 +212,7 @@ Los archivos de cada medición están en [`evaluacion/`](evaluacion/) y el set d
 ├── notebooks/       P1 a P6 (P6 es el ejecutable)
 ├── evaluacion/      resultados de cada versión y gráfico comparativo
 ├── evidencia/       capturas de la interfaz y salida de las pruebas automáticas
-├── docs/            bitácora de iteraciones, informe y diagrama de la EP1
+├── docs/            bitácora de iteraciones, informes de la EP1 y la EP2 y diagramas de arquitectura
 └── requirements.txt
 ```
 
@@ -227,7 +231,7 @@ Los archivos de cada medición están en [`evaluacion/`](evaluacion/) y el set d
 | Herramienta | Uso | Validado por |
 |---|---|---|
 | Gemini (Google) | Motor del agente, generación de preguntas hipotéticas y juez de la evaluación | Felipe y Adolfo |
-| Claude (Anthropic) | Análisis de la pauta y del material del curso, propuesta de diseño para la EP2, código base de las celdas 5a, 5b, 6b y 7 y redacción de este README | Felipe y Adolfo |
+| Claude (Anthropic) | Análisis de la pauta y del material del curso, propuesta de diseño para la EP2, código base de las celdas 5a, 5b, 6b y 7, refuerzo de la prueba de memoria, redacción de este README y de la bitácora, y formato del informe | Felipe y Adolfo |
 
 El equipo revisó, ejecutó y validó todo el código y los resultados. Las conclusiones, las justificaciones técnicas y las reflexiones individuales del informe fueron escritas sin IA.
 
